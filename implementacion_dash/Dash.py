@@ -184,11 +184,13 @@ figLineFecha = px.line(dfInicioFecha, x="fecha", y="total")
 
 app.layout = html.Div(children=[
     html.H1(children='Covid 19 Dashboard', className="text-center"), 
-    html.H2(children='Casos contagios por Países (primeros 10 sin Colombia)'),
+    html.H2(children='Casos por lugar de contagio (primeros 10 sin Colombia)'),
     dcc.Graph(
         id='PieCasosPais',
         figure=figPieCasosP2
     ),
+  
+    html.H2(children='Casos por lugar de contagio (todos los países)')
     dcc.Graph(
         id='mapCasosPais',
         figure=figMapCasosP
