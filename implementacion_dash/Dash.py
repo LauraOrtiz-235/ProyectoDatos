@@ -73,18 +73,12 @@ query = pd.read_sql_query(sql.total_casos_pais2(), con.connection)
 con.closeConnection()
 
 dfCasosP2 = pd.DataFrame(query, columns=["total", "nombre"])
-figPieCasosP2 = px.pie(dfCasosP2, values= "total", names = "nombre", color_discrete_sequence=px.colors.sequential.Emrld)
+figPieCasosP2 = px.pie(dfCasosP2, values= "total", names = "nombre", 
+                        color_discrete_sequence=px.colors.sequential.Emrld)
 
-con.openConnection()
-query = pd.read_sql_query(sql.total_casos_pais(), con.connection)
-con.closeConnection()
-
-dfCasosP = pd.DataFrame(query, columns=["total", "nombre", "codigo"])
-figMapCasosP = px.choropleth(dfCasosP, locations="nombre",
-                            locationmode="country names",
-                            color="total",
-                            hover_name="nombre",
-                            color_continuous_scale=["#ECFCCD", "#83E9B6"])
+figBarCasosP2 = px.bar(dfCasosP2.head(20), x="nombre", y="total",
+                        color='total',
+                        color_continuous_scale=["#DAF7A6", "#83E9B6"])
 
 con.openConnection()
 query = pd.read_sql_query(sql.total_casos_pais(), con.connection)
@@ -174,8 +168,8 @@ con.openConnection()
 query = pd.read_sql_query(sql.total_por_tipo_contagio(), con.connection)
 con.closeConnection()
 
-dfCasosTipo = pd.DataFrame(query, columns=["total", "nombre", "tipo_contagio"])
-figBarCasosTipo = px.bar(dfCasosTipo.head(20), x="tipo_contagio", y="total",
+dfCasosTipo = pd.DataFrame(query, columns=["total", "nombre_pais", "nombre"])
+figBarCasosTipo = px.bar(dfCasosTipo.head(20), x="nombre", y="total",
                         color='total',
                         color_continuous_scale=["#44C3BF", "#B0F7F5"])
 
@@ -187,8 +181,8 @@ con.openConnection()
 query = pd.read_sql_query(sql.total_por_tipo_recuperacion(), con.connection)
 con.closeConnection()
 
-dfCasosRecu = pd.DataFrame(query, columns=["total", "tipo_recuperacion"])
-figBarCasosRecu = px.bar(dfCasosRecu.head(20), x="tipo_recuperacion", y="total", 
+dfCasosRecu = pd.DataFrame(query, columns=["total", "nombre"])
+figBarCasosRecu = px.bar(dfCasosRecu.head(20), x="nombre", y="total", 
                         color='total',
                         color_continuous_scale=["#44C3BF", "#B0F7F5"])
 
@@ -228,25 +222,12 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Contagios en el exterior', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos positivos por país', style={'color': "#FFFFFF"}),
                     ]),
                     dcc.Graph(
                         id='PieCasosPais',
                         figure=figPieCasosP2
                     ),
-                    dcc.Markdown("Hola")
-                ]),
-            ]),
-        ]),
-    ]),
-
-    html.Div(className="container-fluid", children=[
-        html.Div(className="row", children=[
-            html.Div(className="col", children=[
-                html.Div(className="card", children=[
-                    html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por país', style={'color': "#FFFFFF"}),
-                    ]),    
                     html.Div(className="card-body", children=[
                         html.Div(className="row", children=[
                             html.Div(className="col-lg-12 col-xl-6", children=[
@@ -257,8 +238,8 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
                             ]),
                             html.Div(className="col-lg-12 col-xl-6", children=[
                                 dcc.Graph(
-                                    id='MapCasosPais',
-                                    figure=figMapCasosP
+                                    id='BarCasosPais',
+                                    figure=figBarCasosP2
                                 ),
                             ]),
                         ]),
@@ -301,7 +282,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por Departamento', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por departamento', style={'color': "#FFFFFF"}),
                     ]),
                     html.Div(className="card-body", children=[
                         html.Div(className="row", children=[
@@ -329,7 +310,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por Municipio', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por municipio', style={'color': "#FFFFFF"}),
                     ]),
                     html.Div(className="card-body", children=[
                         html.Div(className="row", children=[
@@ -357,24 +338,12 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Edad con mas Contagios', style={'color': "#FFFFFF"}),
+                        html.H2(children='Edad con mas contagios', style={'color': "#FFFFFF"}),
                     ]),
-                    html.Div(className="card-body", children=[
-                        html.Div(className="row", children=[
-                            html.Div(className="col-lg-12 col-xl-6", children=[    
-                                dcc.Graph(
-                                    id='HistEdadContagios',
-                                    figure=figHistEdadCont
-                                ),
-                            ]),
-                            html.Div(className="col-lg-12 col-xl-6", children=[
-                                dcc.Graph(
-                                    id='LineEdadContagios',
-                                    figure=figLineEdadCont
-                                ),
-                            ]),
-                        ]),
-                    ]),
+                    dcc.Graph(
+                        id='LineEdadContagios',
+                        figure=figLineEdadCont
+                    ),
                 ]),
             ]),
         ]),
@@ -385,24 +354,12 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Edad con mas Muertes', style={'color': "#FFFFFF"}),
+                        html.H2(children='Edad con mas muertes', style={'color': "#FFFFFF"}),
                     ]),
-                    html.Div(className="card-body", children=[
-                        html.Div(className="row", children=[
-                            html.Div(className="col-lg-12 col-xl-6", children=[
-                                dcc.Graph(
-                                    id='LineEdadMuertes',
-                                    figure=figLineEdadMuertes
-                                ),
-                            ]),
-                            html.Div(className="col-lg-12 col-xl-6", children=[
-                                dcc.Graph(
-                                    id='HistEdadMuertes',
-                                    figure=figHistEdadMuertes
-                                ),
-                            ]),
-                        ]),
-                    ]),
+                    dcc.Graph(
+                        id='LineEdadMuertes',
+                        figure=figLineEdadMuertes
+                    ),
                 ]),
             ]),
         ]),
@@ -413,24 +370,12 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Edad con mas Recuperaciones', style={'color': "#FFFFFF"}),
+                        html.H2(children='Edad con mas recuperaciones', style={'color': "#FFFFFF"}),
                     ]),
-                    html.Div(className="card-body", children=[
-                        html.Div(className="row", children=[
-                            html.Div(className="col-lg-12 col-xl-6", children=[
-                                dcc.Graph(
-                                    id='HistEdadRecu',
-                                    figure=figHistEdadRecu
-                                ),
-                            ]),
-                            html.Div(className="col-lg-12 col-xl-6", children=[
-                                dcc.Graph(
-                                    id='LineEdadRecu',
-                                    figure=figLineEdadRecu
-                                ),
-                            ]),
-                        ]),
-                    ]),
+                    dcc.Graph(
+                        id='LineEdadRecu',
+                        figure=figLineEdadRecu
+                    ),
                 ]),
             ]),
         ]),
@@ -441,7 +386,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por Tipo de Contagio', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por tipo de contagio', style={'color': "#FFFFFF"}),
                     ]),
                     dcc.Graph(
                         id='BarCasosTipo',
@@ -457,7 +402,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por Tipo de Recuperación', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por tipo de recuperación', style={'color': "#FFFFFF"}),
                     ]),    
                     dcc.Graph(
                         id='BarCasosRecu',
@@ -473,7 +418,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por Género', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por género', style={'color': "#FFFFFF"}),
                     ]),  
                     dcc.Graph(
                         id='PieCasosGenero',
@@ -489,7 +434,7 @@ app.layout = html.Div(style={'backgroundColor': "#35C8F0"}, children=[
             html.Div(className="col", children=[
                 html.Div(className="card", children=[
                     html.Div(className="card-header bg-info text-#D4F2FB", children=[
-                        html.H2(children='Casos por la fecha de inicio de los Síntomas', style={'color': "#FFFFFF"}),
+                        html.H2(children='Casos por la fecha de inicio de los síntomas', style={'color': "#FFFFFF"}),
                     ]),  
                     dcc.Graph(
                         id='LineFechaInicio',
